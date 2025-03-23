@@ -1,6 +1,7 @@
 import OAI from "openai";
 import { OPEN_AI_SECRET_KEY } from "../helpers/constants.js";
 import User from "../models/userm.js";
+import { Conversation } from "../models/conversation.js";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
@@ -19,9 +20,10 @@ class OpenAI {
     this.openai = new OAI({
       apiKey: OPEN_AI_SECRET_KEY,
     });
+    this.prompts = []
   }
 
-  async handleTmay(response, userID) {
+  async handleTmay(response, phoneNumber) {
     const completion = await this.openai.chat.completions.create({
       messages: [
         {
@@ -49,10 +51,42 @@ class OpenAI {
       store: true,
       response_format: zodResponseFormat(myEvent, "event"),
     });
-    const jsonResponse = JSON.parse(completion.choices[0].content)
+    const jsonResponse = JSON.parse(completion.choices[0].message.content)
+    if (jsonResponse) {
+        const tmi = {}
+        const typeofCandidate = {}
+        const user = await User.findOne({phoneNumber: phoneNumber})
+        if (jsonResponse.summary){
+            tmi["summar"] = jsonResponse.summary
+        }
+        if(jsonResponse.candidateType){
+            typeofCandidate["candidateType"] = jsonResponse.candidateType
+            this.prompts.push("Are you  a student or a professional?")
+        }
+        if (!NaN(jsonResponse.yearsOfExperience)){
+            typeofCandidate["experience"] = jsonResponse.yearsOfExperience
+            this.prompts.push("How many years of exp do you have?")
+        }
+        if(jsonResponse.programmingLanguages){
+            user["programmingLanguages"] = jsonResponse.programmingLanguages.join(",")
+            this.prompts.push("what programming languages are you comfortable with?")
+        }
+        this.prompts.push("are you fine with a 7,500 Rupees/month fee for the course?")
+        user.tellMeAboutYourself = {...tmi};
+        user.typeofCandidate = {...typeofCandidate}
+        await user.save()
+    }
+    let newMessage = ""
+    const conversations = await Conversation.find({phoneNumber})
+    if(this.prompts.length>0){
+        newMessage = this.prompts.pop()
+        conversations.messages.push({from:"ai", text: newMessage, link: false})
+        await conversations.save()
+    }
     console.log(jsonResponse)
-    
+
     console.log(completion.choices[0]);
+    return conversations
   }
 
   async createMessage(threadID, userResponse) {

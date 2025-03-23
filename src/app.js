@@ -52,10 +52,10 @@ io.on("connection", (socket) => {
     io.emit("receive_message", data);
   });
 
-  socket.on("tmay_response", (data) => {
+  socket.on("tmay_response", async (data) => {
     console.log("Message received: second", data);
-    openai.handleTmay(data.text)
-
+    const conversations = await openai.handleTmay(data.text, data.phoneNumber)
+    io.emit("new_msg", conversations)
     // io.emit("message", data);
   });
 
