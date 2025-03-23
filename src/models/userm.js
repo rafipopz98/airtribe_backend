@@ -59,17 +59,17 @@ const userSchema = new Schema ({
         required: true,
     },
 
-    tellMeAboutYourself: TellMeAboutYourselfSchema,
+    tellMeAboutYourself: {
+        type: TellMeAboutYourselfSchema,
+    },
     programmingLanguage: {
         type: String,
     },
     capitalCommitment: {
         type: Boolean,
-        required: true
     },
     timeCommitment: {
         type: Boolean,
-        required: true,
     },
     typeofCandidate: TypeOfCandidateSchema,
     socials: socialsSchema,
