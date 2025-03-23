@@ -15,7 +15,14 @@ router.post("/add-user", async (req, res) =>{
         
         res.status(200).json({user: newUser})
         // create Conversation
-        const conversation = new Conversation({userId: newUser._id, phoneNumber})
+        const messages = []
+        const message = {
+            from: "ai",
+            text: "TMAY",
+            link: false,
+        }
+        messages.push(message)
+        const conversation = new Conversation({userId: newUser._id, phoneNumber, messages, stage: "tmay"})
         await conversation.save()
     }catch (error) {
         console.log("Error while handling user-form-submit error: ", error);

@@ -19,6 +19,7 @@ const messageSchema = new Schema({
 
 const ConversationSchema = new Schema({
     threadId: String,
+    stage: String,
     phoneNumber: {
         type: Number,
         required: true,
@@ -28,7 +29,7 @@ const ConversationSchema = new Schema({
         ref: "User",
         required: true
     },
-    Messages: [messageSchema]
+    messages: [messageSchema]
 })
 
 
