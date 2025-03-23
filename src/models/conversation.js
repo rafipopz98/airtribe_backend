@@ -12,7 +12,7 @@ const messageSchema = new Schema({
     },
     link: {
         type: Boolean,
-        defaut: false,
+        default: false,
     }
 
 })

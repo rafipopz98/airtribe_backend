@@ -3,8 +3,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { PORT, DB_URL } from "./helpers/constants.js";
 import mongoose from "mongoose";
-import http from "http"
-import { Server }  from "socket.io"
+import http from "http";
+import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -15,31 +15,56 @@ const io = new Server(server, {
   },
 });
 
-app.use(cors({
-  origin: ['http://localhost:5173'],
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 
-import userRoutes from  "./API/user.js"
-import conversationRoutes from "./API/configuration.js"
-
+import userRoutes from "./API/user.js";
+import conversationRoutes from "./API/configuration.js";
+import OpenAI from "./openAI/index.js";
 
 // DB Connect:
-mongoose.connect(DB_URL)
+mongoose.connect(DB_URL);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   console.log("Database connected");
 });
 
-app.use("/user", userRoutes)
-app.use("/conversations", conversationRoutes)
+const openai = new OpenAI();
+
+app.use("/user", userRoutes);
+app.use("/conversations", conversationRoutes);
 
 io.on("connection", (socket) => {
-  console.log(socket.id)
-})
+  console.log(`User Connected: ${socket.id}`);
+
+  // Listen for a message event
+  socket.on("send_message", (data) => {
+    console.log("Message received: first", data);
+
+    // Broadcast the message to all clients
+    io.emit("receive_message", data);
+  });
+
+  socket.on("tmay_response", (data) => {
+    console.log("Message received: second", data);
+    openai.handleTmay(data.text)
+
+    // io.emit("message", data);
+  });
+
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log(`User Disconnected: ${socket.id}`);
+  });
+});
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
