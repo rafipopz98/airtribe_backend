@@ -6,16 +6,18 @@ import {Conversation} from "../models/conversation.js";
 router.post("/add-user", async (req, res) =>{
     try{
         const {name, phoneNumber, email} = req.body;
+        console.log(req.body)
         if (!name || !phoneNumber, !email) {
             return res.status(400).json({error: "insufficient data"})
         } 
-        const newUser = new User({name, email, phoneNumber})
-        await newUser.save()
+        // const newUser = new User({name, email, phoneNumber})
+        const newUser = User.create({name, email, phoneNumber})
+        // await newUser.save()
         
         res.status(201)
         
         // create Conversation
-        const conversation = new Conversation({userId: newUser._id})
+        const conversation = new Conversation({userId: newUser._id, phoneNumber})
         await conversation.save()
     }catch (error) {
         console.log("Error while handling user-form-submit error: ", error);
