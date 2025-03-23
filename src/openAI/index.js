@@ -57,13 +57,16 @@ class OpenAI {
             userInput:response
         }
         const typeofCandidate = {}
+        let newStage = ""
         const user = await User.findOne({phoneNumber: phoneNumber})
         if (jsonResponse.summary){
             tmi["summar"] = jsonResponse.summary
         }
         if(jsonResponse.candidateType){
             typeofCandidate["candidateType"] = jsonResponse.candidateType
+        }else{
             this.prompts.push("Are you  a student or a professional?")
+            newStage = "candidateType"
         }
         if (!isNaN(jsonResponse.yearsOfExperience)){
             typeofCandidate["experience"] = jsonResponse.yearsOfExperience
@@ -71,8 +74,12 @@ class OpenAI {
         }
         if(jsonResponse.programmingLanguages){
             user["programmingLanguages"] = jsonResponse.programmingLanguages.join(",")
+        }else{
+            if (!newStage) newStage = "programmingLanguages"
             this.prompts.push("what programming languages are you comfortable with?")
         }
+
+        if (!stage) stage = "capitalCommitment"
         this.prompts.push("are you fine with a 7,500 Rupees/month fee for the course?")
         user.tellMeAboutYourself = {...tmi};
         user.typeofCandidate = {...typeofCandidate}
@@ -83,7 +90,8 @@ class OpenAI {
     console.log(conversations)
     if(this.prompts.length>0){
         newMessage = this.prompts.pop()
-        conversations.messages.push({from:"ai", text: newMessage, link: false})
+        conversations.messages.push({from:"user", text: response, link: false, stage: newStage})
+        conversations.messages.push({from:"ai", text: newMessage, link: false, stage: newStage})
         await conversations.save()
     }
     console.log(jsonResponse)
