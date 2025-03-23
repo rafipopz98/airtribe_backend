@@ -49,6 +49,9 @@ class OpenAI {
       store: true,
       response_format: zodResponseFormat(myEvent, "event"),
     });
+    const jsonResponse = JSON.parse(completion.choices[0].content)
+    console.log(jsonResponse)
+    
     console.log(completion.choices[0]);
   }
 
