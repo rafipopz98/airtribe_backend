@@ -18,6 +18,7 @@ const messageSchema = new Schema({
 })
 
 const ConversationSchema = new Schema({
+    threadId: String,
     phoneNumber: {
         type: Number,
         required: true,
