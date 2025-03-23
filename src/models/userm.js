@@ -5,7 +5,6 @@ const { Schema } = mongoose;
 const TellMeAboutYourselfSchema = new Schema ({
     userInput: {
         type: String,
-        required: true,
     },
     summary: {
         type: String,
@@ -17,11 +16,9 @@ const TellMeAboutYourselfSchema = new Schema ({
 const TypeOfCandidateSchema = new Schema({
     cadidateType: {
         type: String,
-        required: true,
     },
     experience: {
         type: Number,
-        required: true,
     },
     field: {
         type: String,

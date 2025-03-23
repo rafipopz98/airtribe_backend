@@ -53,7 +53,9 @@ class OpenAI {
     });
     const jsonResponse = JSON.parse(completion.choices[0].message.content)
     if (jsonResponse) {
-        const tmi = {}
+        const tmi = {
+            userInput:response
+        }
         const typeofCandidate = {}
         const user = await User.findOne({phoneNumber: phoneNumber})
         if (jsonResponse.summary){
@@ -63,7 +65,7 @@ class OpenAI {
             typeofCandidate["candidateType"] = jsonResponse.candidateType
             this.prompts.push("Are you  a student or a professional?")
         }
-        if (!NaN(jsonResponse.yearsOfExperience)){
+        if (!isNaN(jsonResponse.yearsOfExperience)){
             typeofCandidate["experience"] = jsonResponse.yearsOfExperience
             this.prompts.push("How many years of exp do you have?")
         }
@@ -77,7 +79,8 @@ class OpenAI {
         await user.save()
     }
     let newMessage = ""
-    const conversations = await Conversation.find({phoneNumber})
+    const conversations = await Conversation.findOne({phoneNumber})
+    console.log(conversations)
     if(this.prompts.length>0){
         newMessage = this.prompts.pop()
         conversations.messages.push({from:"ai", text: newMessage, link: false})
