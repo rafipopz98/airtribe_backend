@@ -26,15 +26,72 @@ const bioAnalysisPrompt = createPromptTemplate(
      - yearsOfExperience: Their experience level if present else null. If student keep it null.
      - educationStatus: true if they are a final year student else false. If professional keep it null.
      - programmingLanguages: Languages they know (as an array)
-     - missingFields: An array of information that's missing and needs to be asked in the next step (candidateType, yearsOfExperience or educationStatus, programmingLanguages)
-     
+      
      Strictly follow the output JSON format.
      {
      "summary": "string",
      "candidateType": "string | null",
      "yearsOfExperience": "number | null",
      "educationStatus": "boolean | null",
-     "programmingLanguages": "string[]",
-     "missingFields": "string[]"
+     "programmingLanguages": "string[]"
      }`
 );
+
+//if candidate is null then do:
+const candidatePrompt = createPromptTemplate(
+    `You are an AI assistant analyzing a candidate's message.
+       
+       Question: {question}
+       userResponse: {answer}
+
+       Understand the question and extract the following information if present else keep them as null in the output schema:
+        
+       Strictly follow the output JSON format.
+       {
+       "candidateType": "string | null",
+       }`
+  );
+
+//if YOE is null then do:
+const yearsOfExperiencePrompt = createPromptTemplate(
+    `You are an AI assistant analyzing a candidate's message.
+       
+       Question: {question}
+       userResponse: {answer}
+
+       Understand the question and extract the following information if present else keep them as null in the output schema:
+        
+       Strictly follow the output JSON format.
+       {
+       "yearsOfExperience": "string | null",
+       }`
+  );
+
+
+const educationStatusPrompt = createPromptTemplate(
+    `You are an AI assistant analyzing a candidate's message.
+       
+       Question: {question}
+       userResponse: {answer}
+
+       Understand the question and extract the following information if present else keep them as null in the output schema:
+        
+       Strictly follow the output JSON format.
+       {
+       "educationStatus": "string | null",
+       }`
+  );
+
+const programmingLanguagesPrompt = createPromptTemplate(
+    `You are an AI assistant analyzing a candidate's message.
+       
+       Question: {question}
+       userResponse: {answer}
+
+       Understand the question and extract the following information if present else keep them as null in the output schema:
+        
+       Strictly follow the output JSON format.
+       {
+       "programmingLanguages": "string[]"
+       }`
+  );
