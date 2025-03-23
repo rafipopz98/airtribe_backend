@@ -9,7 +9,12 @@ const messageSchema = new Schema({
     text: {
         type: String,
         required: true,
+    },
+    link: {
+        type: Boolean,
+        defaut: false,
     }
+
 })
 
 const ConversationSchema = new Schema({
